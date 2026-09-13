@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"log/slog"
 	"net/http"
 	"time"
 
@@ -12,14 +13,13 @@ import (
 func main() {
 
 	cfg := config.MustLoad()
-	fmt.Println(cfg)
 
 	mux := http.NewServeMux()
 
 	mux.HandleFunc("GET /healthz", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte(`{"status":"All ok"}`))
+		w.Write([]byte(`{"status":"ok"}`))
 	})
 
 	server := http.Server{
@@ -30,7 +30,12 @@ func main() {
 		IdleTimeout:  time.Second * 10,
 	}
 
+	slog.Info("server started",
+		slog.String("addr", fmt.Sprintf("localhost:%v", cfg.Port)),
+	)
+
 	if err := server.ListenAndServe(); err != nil {
 		log.Fatalf("server failed: %v", err)
 	}
+
 }

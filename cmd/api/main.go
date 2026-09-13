@@ -1,12 +1,18 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"time"
+
+	"github.com/raj-27/olx-api/internal/config"
 )
 
 func main() {
+
+	cfg := config.MustLoad()
+	fmt.Println(cfg)
 
 	mux := http.NewServeMux()
 
@@ -17,7 +23,7 @@ func main() {
 	})
 
 	server := http.Server{
-		Addr:         ":8090",
+		Addr:         ":" + cfg.Port,
 		Handler:      mux,
 		ReadTimeout:  time.Second * 10,
 		WriteTimeout: time.Second * 10,

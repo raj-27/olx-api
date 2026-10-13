@@ -12,8 +12,10 @@ type Config struct {
 	DATABASE_URL string
 }
 
+// MustLoad loads config from .env file (via godotenv) or system environment variables.
+// Panics if any required value is missing.
 func MustLoad() Config {
-	godotenv.Load()
+	godotenv.Load() // reads .env file into os environment
 
 	port := os.Getenv("PORT")
 	if port == "" {
@@ -25,15 +27,14 @@ func MustLoad() Config {
 		panic("ENV is required.")
 	}
 
-	// DATABASE_URL
 	dbUrl := os.Getenv("DATABASE_URL")
-	if env == "" {
+	if dbUrl == "" {
 		panic("DATABASE_URL is required.")
 	}
+
 	return Config{
 		Port:         port,
 		Env:          env,
 		DATABASE_URL: dbUrl,
 	}
-
 }

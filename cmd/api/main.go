@@ -13,33 +13,34 @@ import (
 )
 
 func main() {
-
-	// load config
+	// Load application configuration.
 	cfg := config.MustLoad()
 
+	// Establish database connection.
 	_, err := db.Connect(cfg.DATABASE_URL)
 	if err != nil {
-		log.Fatalf("main.db.connect:%v", err)
+		log.Fatalf("database connection failed: %v", err)
 	}
 
-	slog.Info("db connected")
+	slog.Info("database connected")
 
+	// Register HTTP routes.
 	mux := http.NewServeMux()
-
 	mux.HandleFunc("GET /healthz", handlers.Health())
 
+	// Configure HTTP server with timeouts.
 	server := http.Server{
 		Addr:         ":" + cfg.Port,
 		Handler:      mux,
-		ReadTimeout:  time.Second * 10,
-		WriteTimeout: time.Second * 10,
-		IdleTimeout:  time.Second * 10,
+		ReadTimeout:  10 * time.Second,
+		WriteTimeout: 10 * time.Second,
+		IdleTimeout:  10 * time.Second,
 	}
 
-	slog.Info("server started", slog.String("addr", fmt.Sprintf("localhost:%v", cfg.Port)))
+	slog.Info("server started", slog.String("addr", fmt.Sprintf("localhost:%s", cfg.Port)))
 
+	// Start the HTTP server.
 	if err := server.ListenAndServe(); err != nil {
-		log.Fatalf("server failed: %v", err)
+		log.Fatalf("server stopped: %v", err)
 	}
-
 }

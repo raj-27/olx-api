@@ -35,7 +35,6 @@ func main() {
 	// Always close the migration instance before exiting.
 	defer func() {
 		sourceErr, databaseErr := m.Close()
-
 		if sourceErr != nil {
 			slog.Error("failed to close migration source", slog.Any("error", sourceErr))
 		}
@@ -50,15 +49,12 @@ func main() {
 
 	case "up":
 		slog.Info("running database migrations", slog.String("direction", "up"))
-
 		if err := m.Up(); err != nil {
-
 			// ErrNoChange means all migrations are already applied.
 			if errors.Is(err, migrate.ErrNoChange) {
 				slog.Info("database is already up to date")
 				return
 			}
-
 			slog.Error("failed to run migrations", slog.String("direction", "up"), slog.Any("error", err))
 			return
 		}
@@ -66,8 +62,7 @@ func main() {
 
 	case "down":
 		slog.Info("rolling back database migrations", slog.String("direction", "down"))
-		if err := m.Down(); err != nil {
-
+		if err := m.Steps(-1); err != nil {
 			// ErrNoChange means there are no migrations to roll back.
 			if errors.Is(err, migrate.ErrNoChange) {
 				slog.Info("no migrations to roll back")

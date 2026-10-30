@@ -13,14 +13,16 @@ import (
 )
 
 func main() {
+
 	// Load application configuration.
 	cfg := config.MustLoad()
 
 	// Establish database connection.
-	_, err := db.Connect(cfg.DATABASE_URL)
+	database, err := db.Connect(cfg.DATABASE_URL)
 	if err != nil {
 		log.Fatalf("database connection failed: %v", err)
 	}
+	defer database.Close()
 
 	slog.Info("database connected")
 
